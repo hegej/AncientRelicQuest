@@ -18,12 +18,18 @@
 </div>
 
 <script type="text/javascript">
-        function typeMessage(element, message, index = 0) {
-            if (index < message.length) {
-                element.value += message.charAt(index);
-                setTimeout(() => typeMessage(element, message, index + 1), 200);
-            }
+
+    function typeMessage(element, message, callback, index = 0) {
+        if (index === 0) {
+            element.value += "Cleora: ";
         }
+        if (index < message.length) {
+            element.value += message.charAt(index);
+            setTimeout(() => typeMessage(element, message, callback, index + 1), 200);
+        } else if (callback) {
+            callback();
+        }
+    }
 
     function fetchRiddle() {
         fetch('/api/Quest/GetRiddle')
@@ -38,14 +44,15 @@
     document.getElementById("sendButton").addEventListener("click", function (event) {
         const user = document.getElementById("userInput").value;
         const message = document.getElementById("messageInput").value;
+        const chatWindow = document.getElementById("chatWindow");
+
         const encodedMsg = user + ": " + message + "\n";
         chatWindow.value += encodedMsg;
 
-        const chatWindow = document.getElementById("chatWindow");
 
         if (message.trim().toLowerCase() === "hello") {
-            const cleoraReply = "Hello, " + user + "!";
-            typeMessage(chatWindow, "Cleora: " + cleoraReply);
+            const cleoraReply = "Hello, " + user + "!\n";
+            typeMessage(chatWindow, cleoraReply, fetchRiddle);
         } else {
             fetch('/api/Quest/EvaluateAnswer', {
                 method: 'POST',
@@ -60,10 +67,10 @@
                 .then(response => response.json())
                 .then(isCorrect => {
                     if (isCorrect) {
-                        typeMessage(chatWindow, "Cleora: Good job, that's correct.");
+                        typeMessage(chatWindow, "Good job, that's correct.\n");
                         fetchRiddle();
                     } else {
-                        typeMessage(chatWindow, "Cleora: That is incorrect. Try again.");
+                        typeMessage(chatWindow, "That is incorrect. Try again.\n");
                     }
                 });
         }
@@ -80,7 +87,7 @@
         }
     });
 
-    let currentRiddleId;
-    fetchRiddle();
+    // let currentRiddleId;
+    // fetchRiddle();
 
 </script>
