@@ -46,7 +46,7 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers(); // For API controllers
-            endpoints.MapRazorPages(); // If you're using Razor pages
+
         });
     }
 }
