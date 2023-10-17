@@ -38,6 +38,9 @@
     document.getElementById("sendButton").addEventListener("click", function (event) {
         const user = document.getElementById("userInput").value;
         const message = document.getElementById("messageInput").value;
+        const encodedMsg = user + ": " + message + "\n";
+        chatWindow.value += encodedMsg;
+
         const chatWindow = document.getElementById("chatWindow");
 
         if (message.trim().toLowerCase() === "hello") {
