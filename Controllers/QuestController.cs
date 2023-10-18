@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using AncientRelicQuest.Services;
 
 namespace AncientRelicQuest.Controllers
@@ -15,17 +14,37 @@ namespace AncientRelicQuest.Controllers
             _questTask = questTask;
         }
 
-        [HttpGet("GetRiddle")]
-        public ActionResult<Riddle> GetRiddle()
+        [HttpGet(nameof(GetRiddle))]
+        public IActionResult GetRiddle()
         {
-            return Ok(_questTask.GetRandomRiddle());
+            try
+            {
+                var riddle = _questTask.GetNextRiddle();
+                if (riddle == null)
+                {
+                    return NotFound("No more riddles available.");
+                }
+
+                return Ok(riddle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("An error occurred while retrieving the riddle: " + ex.Message);
+            }
         }
 
-        [HttpPost("EvaluateAnswer")]
-        public ActionResult<bool> EvaluateAnswer(int riddleId, string answer)
+        [HttpPost(nameof(EvaluateAnswer))]
+        public IActionResult EvaluateAnswer(int riddleId, string answer)
         {
-            return Ok(_questTask.EvaluateAnswer(riddleId, answer));
+            try
+            {
+                bool isCorrect = _questTask.EvaluateAnswer(riddleId, answer);
+                return Ok(isCorrect);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("An error occurred while evaluating the answer: " + ex.Message);
+            }
         }
     }
 }
-

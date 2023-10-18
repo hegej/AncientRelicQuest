@@ -25,20 +25,22 @@
         }
         if (index < message.length) {
             element.value += message.charAt(index);
-            setTimeout(() => typeMessage(element, message, callback, index + 1), 200);
+            setTimeout(() => typeMessage(element, message, callback, index + 1), 50);
         } else if (callback) {
             callback();
         }
     }
 
-    function fetchRiddle() {
-        fetch('/api/Quest/GetRiddle')
-            .then(response => response.json())
-            .then(riddle => {
-                const chatWindow = document.getElementById("chatWindow");
-                typeMessage(chatWindow, "Cleora: " + riddle.Question);
-                currentRiddleId = riddle.Id;
-            });
+        function fetchRiddle() {
+            fetch('/api/Quest/GetRiddle')
+                .then(response => response.json())
+                .then(riddle => {
+                    const chatWindow = document.getElementById("chatWindow");
+                    const riddleText = `${riddle.question}\n`;
+                    typeMessage(chatWindow, riddleText);
+                    currentRiddleId = riddle.id;
+                });
+            
     }
 
     document.getElementById("sendButton").addEventListener("click", function (event) {
@@ -66,11 +68,13 @@
             })
                 .then(response => response.json())
                 .then(isCorrect => {
+                    chatWindow.scrollTop = chatWindow.scrollHeight; // Ensure scrolling to the latest message
+
                     if (isCorrect) {
-                        typeMessage(chatWindow, "Good job, that's correct.\n");
-                        fetchRiddle();
+                        typeMessage(chatWindow, "Good job, that's correct.\n", fetchRiddle);
                     } else {
-                        typeMessage(chatWindow, "That is incorrect. Try again.\n");
+                        chatWindow.value += "That is incorrect. Try again.\n";
+                        chatWindow.scrollTop = chatWindow.scrollHeight; // Ensure scrolling to the latest message
                     }
                 });
         }

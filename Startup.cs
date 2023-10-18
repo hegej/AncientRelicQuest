@@ -19,6 +19,7 @@ public class Startup
         services.AddRazorPages();
         services.AddTransient<QuestTask>();
         services.AddControllersWithViews();
+        services.AddControllers();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
