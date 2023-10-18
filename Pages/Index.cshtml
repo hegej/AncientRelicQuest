@@ -10,7 +10,7 @@
 </div>
 
 <div class="container">
-    <textarea id="chatWindow" readonly rows="10" cols="30" style="width: 100%;"></textarea> <!-- This is the chat window -->
+    <textarea id="chatWindow" readonly rows="10" cols="30" style="width: 100%;"></textarea> 
     <br>
     <input type="text" id="userInput" placeholder="Enter your name"/>
     <input type="text" id="messageInput" placeholder="Enter your message"/>
@@ -68,13 +68,13 @@
             })
                 .then(response => response.json())
                 .then(isCorrect => {
-                    chatWindow.scrollTop = chatWindow.scrollHeight; // Ensure scrolling to the latest message
+                    chatWindow.scrollTop = chatWindow.scrollHeight; 
 
                     if (isCorrect) {
                         typeMessage(chatWindow, "Good job, that's correct.\n", fetchRiddle);
                     } else {
                         chatWindow.value += "That is incorrect. Try again.\n";
-                        chatWindow.scrollTop = chatWindow.scrollHeight; // Ensure scrolling to the latest message
+                        chatWindow.scrollTop = chatWindow.scrollHeight; 
                     }
                 });
         }
