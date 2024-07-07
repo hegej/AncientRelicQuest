@@ -10,79 +10,80 @@
 </div>
 
 <div class="container">
-    <textarea id="chatWindow" readonly rows="10" cols="30" style="width: 100%;"></textarea> <!-- This is the chat window -->
+    <textarea id="chatWindow" readonly rows="10" cols="30" style="width: 100%;"></textarea> 
     <br>
-    <input type="text" id="userInput" placeholder="Enter your name" />
-    <input type="text" id="messageInput" placeholder="Enter your message" />
-    <input type="button" id="sendButton" value="Send Message" />
+    <input type="text" id="userInput" placeholder="Enter your name"/>
+    <input type="text" id="messageInput" placeholder="Enter your message"/>
+    <input type="button" id="sendButton" value="Send Message"/>
 </div>
 
 <script type="text/javascript">
-    function typeMessage(element, message, index = 0) {
+
+    function typeMessage(element, message, callback, index = 0) {
+        if (index === 0) {
+            element.value += "Cleora: ";
+        }
         if (index < message.length) {
             element.value += message.charAt(index);
-            setTimeout(() => typeMessage(element, message, index + 1), 200);
+            setTimeout(() => typeMessage(element, message, callback, index + 1), 50);
+        } else if (callback) {
+            callback();
         }
     }
 
-    // Fetch the riddle when the page loads or based on some user action
-    function fetchRiddle() {
-        fetch('/api/Quest/GetRiddle')
-            .then(response => response.json())
-            .then(riddle => {
-                const chatWindow = document.getElementById("chatWindow");
-                typeMessage(chatWindow, "Cleora: " + riddle.Question);
-                currentRiddleId = riddle.Id; // Storing the current riddle's Id for evaluation
-            });
+        function fetchRiddle() {
+            fetch('/api/Quest/GetRiddle')
+                .then(response => response.json())
+                .then(riddle => {
+                    const chatWindow = document.getElementById("chatWindow");
+                    const riddleText = `${riddle.question}\n`;
+                    typeMessage(chatWindow, riddleText);
+                    currentRiddleId = riddle.id;
+                });
+            
     }
 
     document.getElementById("sendButton").addEventListener("click", function (event) {
         const user = document.getElementById("userInput").value;
         const message = document.getElementById("messageInput").value;
+        const chatWindow = document.getElementById("chatWindow");
 
-        document.getElementById("sendButton").addEventListener("click", function (event) {
-            const user = document.getElementById("userInput").value;
-            const message = document.getElementById("messageInput").value;
-            const chatWindow = document.getElementById("chatWindow");
+        const encodedMsg = user + ": " + message + "\n";
+        chatWindow.value += encodedMsg;
 
-            // Check if the user is greeting Cleora
-            if (message.trim().toLowerCase() === "hello") {
-                const cleoraReply = "Hello, " + user + "!";
-                typeMessage(chatWindow, "Cleora: " + cleoraReply);
-            } else {
-                // Evaluate the user's answer
-                fetch('/api/Quest/EvaluateAnswer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        riddleId: currentRiddleId,
-                        answer: message
-                    })
+
+        if (message.trim().toLowerCase() === "hello") {
+            const cleoraReply = "Hello, " + user + "!\n";
+            typeMessage(chatWindow, cleoraReply, fetchRiddle);
+        } else {
+            fetch('/api/Quest/EvaluateAnswer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    riddleId: currentRiddleId,
+                    answer: message
                 })
-                    .then(response => response.json())
-                    .then(isCorrect => {
-                        if (isCorrect) {
-                            typeMessage(chatWindow, "Cleora: Good job, that's correct.");
-                            // If the answer is correct, fetch the next riddle
-                            fetchRiddle();
-                        } else {
-                            typeMessage(chatWindow, "Cleora: That is incorrect. Try again.");
-                        }
-                    });
-            }
+            })
+                .then(response => response.json())
+                .then(isCorrect => {
+                    chatWindow.scrollTop = chatWindow.scrollHeight; 
 
-            chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to the latest message
+                    if (isCorrect) {
+                        typeMessage(chatWindow, "Good job, that's correct.\n", fetchRiddle);
+                    } else {
+                        chatWindow.value += "That is incorrect. Try again.\n";
+                        chatWindow.scrollTop = chatWindow.scrollHeight; 
+                    }
+                });
+        }
 
-            // Clear the message input after sending
-            document.getElementById("messageInput").value = "";
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        document.getElementById("messageInput").value = "";
+        event.preventDefault();
+    });
 
-            event.preventDefault();
-        });
-
-
-    // Send message when "Enter" key is pressed in the message input box
     document.getElementById("messageInput").addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -90,10 +91,7 @@
         }
     });
 
-    // Initiate the first riddle when the page loads
-    let currentRiddleId;
-    fetchRiddle();
+    // let currentRiddleId;
+    // fetchRiddle();
 
 </script>
-
-

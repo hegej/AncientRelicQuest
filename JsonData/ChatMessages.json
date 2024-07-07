@@ -1,14 +1,12 @@
-{
-  "riddles": [
-    {
-      "id": 1,
-      "question": "What comes once in a minute, twice in a moment, but never in a thousand years?",
-      "answer": "m"
-    },
-    {
-      "id": 2,
-      "question": "Another riddle question here.",
-      "answer": "answer here"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "question": "What comes once in a minute, twice in a moment, but never in a thousand years?",
+    "answer": "m"
+  },
+  {
+    "id": 2,
+    "question": "Another riddle question.",
+    "answer": "answer here"
+  }
+]

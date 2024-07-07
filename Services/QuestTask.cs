@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using Newtonsoft.Json;
 
 namespace AncientRelicQuest.Services
 {
@@ -13,16 +14,33 @@ namespace AncientRelicQuest.Services
     {
         private List<Riddle> riddles;
 
-        public QuestTask()
+        private int currentRiddleIndex = 0;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public QuestTask(IWebHostEnvironment webHostEnvironment)
         {
-            var json = File.ReadAllText("JsonData/ChatMessages.json");
-            var data = JsonConvert.DeserializeObject<dynamic>(json);
-            riddles = JsonConvert.DeserializeObject<List<Riddle>>(data.riddles.ToString());
+            _webHostEnvironment = webHostEnvironment;
+            InitializeRiddles();
         }
 
-        public Riddle GetRandomRiddle()
+        private void InitializeRiddles()
         {
-            return riddles[new Random().Next(0, riddles.Count)];
+            var path = Path.Combine(_webHostEnvironment.ContentRootPath, "JsonData", "ChatMessages.json");
+            var json = File.ReadAllText(path);
+            riddles = JsonConvert.DeserializeObject<List<Riddle>>(json);
+        }
+
+        public Riddle GetNextRiddle()
+        {
+            if (currentRiddleIndex < riddles.Count)
+            {
+                return riddles[currentRiddleIndex++];
+            }
+            else
+            {
+                currentRiddleIndex = 1;
+                return riddles[currentRiddleIndex++];
+            }
         }
 
         public bool EvaluateAnswer(int riddleId, string userAnswer)
@@ -35,6 +53,5 @@ namespace AncientRelicQuest.Services
 
             return false;
         }
-
     }
 }

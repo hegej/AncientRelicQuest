@@ -1,9 +1,5 @@
 ﻿using AncientRelicQuest.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+
 
 public class Startup
 {
@@ -14,16 +10,14 @@ public class Startup
 
     public IConfiguration Configuration { get; }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddRazorPages();
         services.AddTransient<QuestTask>();
-
-        // Adding other required services for your app
-        services.AddControllers(); // For API controllers
+        services.AddControllersWithViews();
+        services.AddControllers();
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
@@ -45,8 +39,11 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapControllers(); // For API controllers
-            endpoints.MapRazorPages(); // If you're using Razor pages
+            endpoints.MapRazorPages();
+            endpoints.MapControllers();
+            endpoints.MapControllerRoute( 
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
         });
     }
 }
